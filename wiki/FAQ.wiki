@@ -1,0 +1,11 @@
+#summary Frequently Asked Questions
+
+= Frequently Asked Questions =
+
+ Note: whenever _ !OpenOffice.org _ (_OOo_ for short) is mentioned, this can generally be interpreted to include any office suite derived from OOo such as _ !StarOffice _.
+
+ # *Do I really need to install !OpenOffice.org in order to use JODConverter?*
+  Yes. In fact, JODConverter simply automates OOo operations; all actual conversions are performed by OOo.
+ # *Do I really really need to install !OpenOffice.org? There's no way to install only a few libraries/DLLs instead?*
+  No, you need a complete OOo installation. At most you can omit Base and a few optional component when installing.
+  Splitting OOo conversion filters into independent components is one of the goals of an OOo sub-project called [http://odftoolkit.openoffice.org ODF Toolkit], but don't hold your breath.
