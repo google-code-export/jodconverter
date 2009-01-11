@@ -1,4 +1,4 @@
-#summary First steps with JODConverter
+#summary Quick Start Guide
 
 = Prerequisites =
 
@@ -9,9 +9,22 @@ JODConverter 3.0 requires:
 
 Note that after installing !OpenOffice.org on a new machine you also need to start !OpenOffice.org once and accept the license agreement, otherwise JODConverter will not work correctly. This needs to be done by the same user that will launch JODConverter.
 
-= Command Line Usage =
+= Command Line =
 
 The simplest way to use JODConverter is as a command line tool. This is also a great way to check that everything is working, i.e. that you have the right !OpenOffice.org version installed etc. To convert a single document do e.g.:
 {{{
 java -jar lib/jodconverter-${version}.jar test.odt test.pdf
+}}}
+
+= Java Code =
+
+Here's a basic example of Java code that converts a single document:
+{{{
+    OfficeManager officeManager = new ManagedProcessOfficeManager();
+    officeManager.start();
+
+    OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
+    converter.convert(new File("test.odt"), new File("test.pdf");
+        
+    officeManager.stop();
 }}}
