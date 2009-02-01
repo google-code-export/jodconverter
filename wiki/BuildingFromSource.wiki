@@ -1,0 +1,23 @@
+= Building from source =
+
+== Subversion Repository ==
+
+The latest JODConverter source code is available from the Subversion repository. To check out the library do:
+{{{
+svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter jodconverter
+}}}
+
+== Maven Build ==
+
+JODConverter uses Maven 2 as its build tool, so it can be built in the usual Maven way:
+{{{
+cd jodconverter
+mvn install
+}}}
+
+Additional you can build a ZIP distribution package containing all library dependencies with:
+{{{
+mvn assembly:assembly
+}}}
+
+Please see the [http://maven.apache.org Maven] website for more information about Maven.
