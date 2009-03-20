@@ -12,9 +12,12 @@ svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter jodconver
 JODConverter uses Maven 2 as its build tool, so it can be built in the usual Maven way:
 {{{
 cd jodconverter
+mvn package
+}}}
+and you should have `jodconverter-3.0-SNAPSHOT.jar` in the target dir. If there are test failure, try skipping the tests (not a good practice but because of OOo integration failures may be due to timeout values rather than real issues):
+{{{
 mvn -Dmaven.test.skip package
 }}}
-and you should have `jodconverter-3.0-SNAPSHOT.jar` in the target dir.
 
 You can build a ZIP distribution package containing all library dependencies with:
 {{{
