@@ -12,7 +12,7 @@ svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter jodconver
 JODConverter uses Maven 2 as its build tool, so it can be built in the usual Maven way:
 {{{
 cd jodconverter
-mvn package
+mvn -Dmaven.test.skip package
 }}}
 and you should have `jodconverter-3.0-SNAPSHOT.jar` in the target dir.
 
