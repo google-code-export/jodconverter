@@ -16,7 +16,7 @@ mvn package
 }}}
 and you should have `jodconverter-3.0-SNAPSHOT.jar` in the target dir. If there are test failure, try skipping the tests (not a good practice but because of OOo integration failures may be due to timeout values rather than real issues):
 {{{
-mvn -Dmaven.test.skip package
+mvn -DskipTests package
 }}}
 
 You can build a ZIP distribution package containing all library dependencies with:
