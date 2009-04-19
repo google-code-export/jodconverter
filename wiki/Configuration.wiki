@@ -22,3 +22,9 @@ The profile can be customised in OOo by selecting the Tools > Options menu item.
 OOo inter-process communication can use either TCP sockets or named pipes. The default is to use a TCP socket, usually on port 8100.
 
 Named pipes have the advantage of not taking up TCP ports (with their potential security implications), and they are marginally faster. However they require a native library to be loaded by the JVM, and this means having to set the `java.library.path` system property. That's why it's not the default.
+
+== Process Manager ==
+
+By default JODConverter will use what pure Java provides for starting and stopping OOo processes. This is somewhat limited and doesn't allow e.g. to check that no other OOo process with the same parameters is already running before starting a new one.
+
+More robust platform-specific functionality is available by using external tools, e.g. `ps` on Unix-like systems, but needs to be enabled by specifying an appropriate `ProcessManager` implementation as part of the `OfficeManager` configuration.
