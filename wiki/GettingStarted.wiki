@@ -14,14 +14,14 @@ Note that after installing !OpenOffice.org on a new machine you also need to sta
 
 The simplest way to use JODConverter is as a command line tool. This is also a great way to check that everything is working, i.e. that you have the right !OpenOffice.org version installed etc. To convert a single document do e.g.:
 {{{
-java -jar lib/jodconverter-${version}.jar test.odt test.pdf
+java -jar lib/jodconverter-3.0-beta-2.jar test.odt test.pdf
 }}}
 
 = Java Code =
 
 Here's a basic example of Java code that converts a single document:
 {{{
-    OfficeManager officeManager = new ManagedProcessOfficeManager();
+    OfficeManager officeManager = new ManagedProcessOfficeManager(OfficeConnectionMode.port(8100));
     officeManager.start();
 
     OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
@@ -29,5 +29,7 @@ Here's a basic example of Java code that converts a single document:
         
     officeManager.stop();
 }}}
+
+Note that these few lines will actually do quite a few things: start an OOo process that listens on the specified port, connect to it, tell OOo to load `test.odt`, then to save it as pdf, and finally terminate the OOo process.
 
 A basic example of a web application is available in the Subversion repository, under `jodconverter-sample-webapp`.
