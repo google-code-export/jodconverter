@@ -4,17 +4,22 @@
 
 The latest JODConverter source code is available from the Subversion repository. To check out the library do:
 {{{
-svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter jodconverter
+svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter-core jodconverter-core
+}}}
+
+To check out the sample webapp:
+{{{
+svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter-sample-webapp jodconverter-sample-webapp
 }}}
 
 == Maven Build ==
 
 JODConverter uses Maven 2 as its build tool, so it can be built in the usual Maven way:
 {{{
-cd jodconverter
+cd jodconverter-core
 mvn package
 }}}
-and you should have `jodconverter-3.0-SNAPSHOT.jar` in the target dir. If there are test failure, try skipping the tests (not a good practice but because of OOo integration failures may be due to timeout values rather than real issues):
+and you should have `jodconverter-core-3.0-SNAPSHOT.jar` in the target dir. If there are test failure, try skipping the tests (not a good practice but because of OOo integration failures may be due to timeout values rather than real issues):
 {{{
 mvn -DskipTests package
 }}}
@@ -23,6 +28,6 @@ You can build a ZIP distribution package containing all library dependencies wit
 {{{
 mvn assembly:assembly
 }}}
-which should result in a file called `jodconverter-3.0-SNAPSHOT-dist.zip` in the target dir.
+which should result in a file called `jodconverter-core-3.0-SNAPSHOT-dist.zip` in the target dir.
 
 Please see the [http://maven.apache.org Maven] website for more information about Maven.
