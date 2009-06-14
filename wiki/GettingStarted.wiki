@@ -8,20 +8,22 @@ JODConverter 3.0 requires:
  # Java 1.5 or later
  # [http://download.openoffice.org OpenOffice.org] 3.0.0 or later 
 
-Note that after installing !OpenOffice.org on a new machine you also need to start !OpenOffice.org once and accept the license agreement, otherwise JODConverter will not work correctly. This needs to be done by the same user that will launch JODConverter.
+We recommend that you use the latest OOo version - currently 3.1.0.
 
 = Command Line =
 
-The simplest way to use JODConverter is as a command line tool. This is also a great way to check that everything is working, i.e. that you have the right !OpenOffice.org version installed etc. To convert a single document do e.g.:
+The command line tool provides a good way to check that everything is working, i.e. that you have the right !OpenOffice.org version installed etc. To convert a document do e.g.:
 {{{
-java -jar lib/jodconverter-3.0-beta-2.jar test.odt test.pdf
+java -jar lib/jodconverter-core-3.0-beta-3.jar test.odt test.pdf
 }}}
+
+Note: if all you want is a command line tool, you may also have a look at this [http://www.artofsolving.com/opensource/pyodconverter Python script]. It's smaller, simpler, and easier to customise.
 
 = Java Code =
 
 Here's a basic example of Java code that converts a single document:
 {{{
-    OfficeManager officeManager = new ManagedProcessOfficeManager(OfficeConnectionMode.port(8100));
+    OfficeManager officeManager = new DefaultOfficeManagerConfiguration().buildOfficeManager();
     officeManager.start();
 
     OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager);
@@ -30,6 +32,21 @@ Here's a basic example of Java code that converts a single document:
     officeManager.stop();
 }}}
 
-Note that these few lines will actually do quite a few things: start an OOo process that listens on the specified port, connect to it, tell OOo to load `test.odt`, then to save it as pdf, and finally terminate the OOo process.
+Note that these few lines will actually do quite a few things: start an OOo process that listens on the port 2002, connect to it, tell OOo to load `test.odt`, then to save it as pdf, and finally terminate the OOo process.
+
+Here's another example showing a few configuration options:
+{{{
+    OfficeManager officeManager = new DefaultOfficeManagerConfiguration()
+      .setOfficeHome("/usr/lib/openoffice")
+      .setConnectionProtocol(OfficeConnectionProtocol.PIPE)
+      .setPipeNames("office1", "office2")
+      .setTaskExecutionTimeout(30000L)
+      .buildOfficeManager();
+}}}
+This `officeManager` will use the OOo installation in the specified directory, connecting via named pipes rather than TCP sockets, use a pool of two OOo processes identified by the given pipe names, and abort any conversion that takes longer than 30 seconds. (Note that using named pipes requires adding a native library to `java.library.path`; see [Configuration] for more info.)
+
+== Web Applications ==
 
 A basic example of a web application is available in the Subversion repository, under `jodconverter-sample-webapp`.
+
+The most important concept is that you should start a single `OfficeManager` instance when your webapp starts (using a servlet listener, Spring context configuration, or equivalent facility provided by your framework of choice), stop it when your webapp stops, and share it across all requests. The `OfficeManager` will take care of multi-threading.
