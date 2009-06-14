@@ -13,4 +13,4 @@ Compared to JODConverter 2.x, version 3.0 will be a substantial rewrite of the c
 
 Additionally the new architecture will make it easier to use the core JODConverter classes as a generic framework for working with OOo - not just limited to document conversions.
 
-As of the first beta, all features except OOo pooling have been implemented. (Pooling is now available in the latest trunk.)
+As of beta-3, all of these features have been implemented.
