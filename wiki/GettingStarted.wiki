@@ -19,6 +19,8 @@ java -jar lib/jodconverter-core-3.0-beta-3.jar test.odt test.pdf
 
 Note: if all you want is a command line tool, you may also have a look at this [http://www.artofsolving.com/opensource/pyodconverter Python script]. It's smaller, simpler, and easier to customise.
 
+*Important*: This tool is not intended to support multiple concurrent executions, e.g. being invoked at each web request from a PHP or Ruby app.
+
 = Java Code =
 
 Here's a basic example of Java code that converts a single document:
