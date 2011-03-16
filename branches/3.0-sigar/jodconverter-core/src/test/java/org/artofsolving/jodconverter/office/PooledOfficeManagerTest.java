@@ -28,15 +28,11 @@ import static org.testng.Assert.fail;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 
-
 import org.artofsolving.jodconverter.ReflectionUtils;
-import org.artofsolving.jodconverter.office.ManagedOfficeProcess;
-import org.artofsolving.jodconverter.office.PooledOfficeManager;
-import org.artofsolving.jodconverter.office.PooledOfficeManagerSettings;
-import org.artofsolving.jodconverter.office.OfficeConnection;
-import org.artofsolving.jodconverter.office.UnoUrl;
-import org.artofsolving.jodconverter.office.OfficeException;
-import org.artofsolving.jodconverter.office.OfficeProcess;
+import org.artofsolving.jodconverter.util.PlatformUtils;
+import org.hyperic.sigar.Sigar;
+import org.hyperic.sigar.ptql.ProcessFinder;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test(groups="integration")
@@ -172,6 +168,35 @@ public class PooledOfficeManagerTest {
         assertEquals(taskCount, 0);  //FIXME should be 1 to be precise
 
         officeManager.stop();
+        assertFalse(connection.isConnected());
+        assertFalse(process.isRunning());
+        assertEquals(process.getExitCode(0, 0), 0);
+    }
+    
+    public void checkAcceptString() throws Exception {
+    	PooledOfficeManager officeManager = new PooledOfficeManager(CONNECTION_MODE);
+        ManagedOfficeProcess managedOfficeProcess = (ManagedOfficeProcess) ReflectionUtils.getPrivateField(officeManager, "managedOfficeProcess");
+        OfficeProcess process = (OfficeProcess) ReflectionUtils.getPrivateField(managedOfficeProcess, "process");
+        OfficeConnection connection = (OfficeConnection) ReflectionUtils.getPrivateField(managedOfficeProcess, "connection");
+        officeManager.start();
+        assertTrue(process.isRunning());
+        assertTrue(connection.isConnected());
+        
+        UnoUrl unoUrl = (UnoUrl) ReflectionUtils.getPrivateField(process, "unoUrl");
+        Sigar sigar = new Sigar();
+		ProcessFinder processFinder = new ProcessFinder(sigar);
+		
+		final String PTQL = "State.Name.re=soffice.*,Args.1.re=";
+		//Why doesn't this acceptstring contain \Q and \E but when running live does?
+		long[] pids = processFinder.find(PTQL + PlatformUtils.escapePTQLForRegex(unoUrl.getAcceptString()));
+		Assert.assertTrue(pids.length == 1);
+        
+        MockOfficeTask task = new MockOfficeTask();
+        officeManager.execute(task);
+        assertTrue(task.isCompleted());
+        
+        officeManager.stop();
+        sigar.close();
         assertFalse(connection.isConnected());
         assertFalse(process.isRunning());
         assertEquals(process.getExitCode(0, 0), 0);

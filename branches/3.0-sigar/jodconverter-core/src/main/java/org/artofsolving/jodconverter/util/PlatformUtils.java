@@ -38,5 +38,19 @@ public class PlatformUtils {
     public static boolean isWindows() {
         return OS_NAME.startsWith("windows");
     }
-
+    
+    /**
+     * This method will escape Comma (,) and Equals sign (=) to Period (.)
+     * Because the PTQL cannot escape those correctly, so we will use '.' in regular expression.
+     * We also have to remove \Q and \E because they are not correctly interpreted as literal characters
+     * 
+     * @param s - The string you want to espace
+     * 
+     * NB: Note that you should only espace the value of the PTQL, not the query it self
+     * ie: State.Name.ct=pipe,name=office1 should be converted to State.Name.ct=pipe.name.office1
+     * @return - The escaped string
+     */
+    public static String escapePTQLForRegex(String s) {
+    	return s.replaceAll(",|=", ".").replaceAll("\\\\Q|\\\\E", "");
+    }
 }

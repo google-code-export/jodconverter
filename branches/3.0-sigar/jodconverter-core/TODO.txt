@@ -1,0 +1,7 @@
+To completely include sigar we need to get the entire zip.
+Then we need to add an antrun execution that will unzip the files to some directory in this project
+where we want them. We only need the sigar-bin/lib folder (minus log4j.jar)
+http://maven.apache.org/plugins/maven-antrun-plugin/usage.html
+
+Until then, we manually put the required native files in the depends folder, 
+and then we can add them in the java.library.path 
