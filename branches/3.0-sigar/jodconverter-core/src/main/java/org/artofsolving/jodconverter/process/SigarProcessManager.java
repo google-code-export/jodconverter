@@ -30,7 +30,7 @@ import org.hyperic.sigar.ptql.ProcessFinder;
  * {@link ProcessManager} implementation for "all" systems. Uses Sigar which 
  * provides a portable interface for gathering system information with native libraries. 
  * 
- * TODO: SigarProcessManager?? due to a lack of a better name
+ * TODO: SimpleProcessManager?? due to a lack of a better name
  * 
  * Use the following native files on the system you are using.
  * For example, minimal requirements to use the SIGAR Java API on Windows would be sigar.jar and sigar-x86-winnt.dll
