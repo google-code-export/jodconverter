@@ -31,6 +31,11 @@
       <name>Mirko Nasato</name>
       <email>mirko@artofsolving.com</email>
     </developer>
+    <developer>
+      <id>shervin.asgari</id>
+      <name>Shervin Asgari</name>
+      <email>shervin@asgari.no</email>
+    </developer>
   </developers>
 
   <dependencies>
@@ -54,6 +59,17 @@
       <artifactId>unoil</artifactId>
       <version>3.2.1</version>
     </dependency>
+    <dependency>
+	  <groupId>org.hyperic</groupId>
+	  <artifactId>sigar</artifactId>
+	  <version>1.6.5.132</version>
+	</dependency>
+    <dependency>
+	  <groupId>org.hyperic</groupId>
+	  <artifactId>sigar-dist</artifactId>
+	  <version>1.6.5.132</version>
+	  <type>zip</type>
+	</dependency>
 
     <dependency>
       <groupId>org.json</groupId>
