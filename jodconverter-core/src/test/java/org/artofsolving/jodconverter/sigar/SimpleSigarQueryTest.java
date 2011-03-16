@@ -21,15 +21,13 @@ package org.artofsolving.jodconverter.sigar;
 
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
 @Test
-public class SimpleSigarQueryTest extends TestCase {
+public class SimpleSigarQueryTest {
 	
-	public void testSimpleQuery() throws Exception {
+	public void simpleQuery() throws Exception {
 		SimpleProcessManager spm = new SimpleProcessManagerImpl();
 		SimplePTQL ptql = new SimplePTQL(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "java");
 		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=java");
