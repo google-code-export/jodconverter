@@ -1,5 +1,8 @@
 package org.artofsolving.jodconverter.sigar;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.artofsolving.jodconverter.util.PlatformUtils;
 
 /**
@@ -41,13 +44,26 @@ public class SimplePTQL {
 			this.operator = operator;
 			this.searchValue = searchValue;
 		}
-		
-		public Builder addArgs(int argument, Operator operator, String searchValue) {
-			//The searchValue cannot contain comma or equals sign
-			args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
+
+		public Builder addArgs(int argument, Operator operator, String searchValue, Strategy strategy) {
+			if(strategy == Strategy.ESCAPE) {
+				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
+			} else {
+				Pattern pattern = Pattern.compile(",|=");
+				Matcher matcher = pattern.matcher(searchValue);
+				if(matcher.find()) throw new IllegalArgumentException("searchValue cannot contain comma or equals sign. Either set Strategy.ESCAPE or remove it from the search value");
+				
+				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + searchValue);
+			}
+			
 			return this;
 		}
 		
+		public Builder setStrategy(Strategy strategy) {
+			this.strategy = strategy;
+			return this;
+		}
+
 		public SimplePTQL createQuery() {
 			return new SimplePTQL(attribute, operator, searchValue, args.toString(), strategy);
 		}
