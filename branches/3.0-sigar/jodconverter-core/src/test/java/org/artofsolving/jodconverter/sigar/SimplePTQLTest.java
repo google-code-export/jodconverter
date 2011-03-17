@@ -21,6 +21,7 @@ package org.artofsolving.jodconverter.sigar;
 
 import java.util.List;
 
+import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 import org.testng.Assert;
 import org.testng.SkipException;
@@ -61,15 +62,26 @@ public class SimplePTQLTest {
 	
 	public void args() throws Exception {
 		SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "office.*")
-		.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E")
+		.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E", Strategy.ESCAPE)
 		.createQuery();
 		Assert.assertEquals(ptql.getQuery(), "State.Name.re=office.*,Args.1.re=pipe.name.office1");
 		
 		ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "office.*")
-		.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E")
-		.addArgs(2, SimplePTQL.RE(), "\\Qpipe,name,office2\\E")
+		.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E", Strategy.ESCAPE)
+		.addArgs(2, SimplePTQL.EQ(), "\\Qpipe,name,office2\\E", Strategy.ESCAPE)
+		.setStrategy(Strategy.ESCAPE)
 		.createQuery();
-		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=office.*,Args.1.re=pipe.name.office1,Args.2.re=pipe.name.office2");
+		
+		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=office.*,Args.1.re=pipe.name.office1,Args.2.eq=pipe.name.office2");
+		
+		try {
+			ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "office.*")
+			.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E", Strategy.ESCAPE)
+			.addArgs(2, SimplePTQL.EQ(), "\\Qpipe,name,office2\\E", Strategy.NOT_ESCAPE)
+			.createQuery();
+		
+			Assert.fail("Method should have thrown IllegalArgumentException");
+		} catch(IllegalArgumentException ex) {}
 	}
 
 	public void realArguments() throws Exception {
@@ -81,7 +93,7 @@ public class SimplePTQLTest {
         Assert.assertNotNull(process);
         
         SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "sleep")
-        					.addArgs(1, SimplePTQL.EQ(), "60s").createQuery();
+        					.addArgs(1, SimplePTQL.EQ(), "60s", Strategy.NOT_ESCAPE).createQuery();
         
         
         SimpleProcessManager spm = new SimpleProcessManagerImpl();
