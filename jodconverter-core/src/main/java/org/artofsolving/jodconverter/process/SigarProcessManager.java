@@ -110,7 +110,6 @@ public class SigarProcessManager implements ProcessManager {
 		Sigar sigar = new Sigar();
 		try {
 			sigar.kill(pid, 9);
-			sigar.close();
 		} catch (SigarException e) {
 			e.printStackTrace();
 			throw new IOException(e.getMessage());
