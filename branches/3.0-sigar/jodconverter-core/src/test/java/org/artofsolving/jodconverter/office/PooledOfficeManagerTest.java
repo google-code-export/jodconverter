@@ -25,10 +25,14 @@ import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.util.List;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 
 import org.artofsolving.jodconverter.ReflectionUtils;
+import org.artofsolving.jodconverter.sigar.SimplePTQL;
+import org.artofsolving.jodconverter.sigar.SimpleProcessManagerImpl;
+import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.ptql.ProcessFinder;
@@ -173,6 +177,42 @@ public class PooledOfficeManagerTest {
         assertEquals(process.getExitCode(0, 0), 0);
     }
     
+    public void checkEntireArgument() throws Exception {
+    	PooledOfficeManager officeManager = new PooledOfficeManager(CONNECTION_MODE);
+        ManagedOfficeProcess managedOfficeProcess = (ManagedOfficeProcess) ReflectionUtils.getPrivateField(officeManager, "managedOfficeProcess");
+        OfficeProcess process = (OfficeProcess) ReflectionUtils.getPrivateField(managedOfficeProcess, "process");
+        OfficeConnection connection = (OfficeConnection) ReflectionUtils.getPrivateField(managedOfficeProcess, "connection");
+        officeManager.start();
+        assertTrue(process.isRunning());
+        assertTrue(connection.isConnected());
+        
+        UnoUrl unoUrl = (UnoUrl) ReflectionUtils.getPrivateField(process, "unoUrl");
+        
+		SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "soffice.*")
+							.addArgs(1, SimplePTQL.RE(), "-accept=" + unoUrl.getAcceptString() + ";urp;", Strategy.ESCAPE)
+							.addArgs(2, SimplePTQL.RE(), "-env:UserInstallation=.+", Strategy.ESCAPE)
+							.addArgs(3, SimplePTQL.EQ(), "-headless", Strategy.NOT_ESCAPE)
+							.addArgs(4, SimplePTQL.EQ(), "-nocrashreport", Strategy.NOT_ESCAPE)
+							.addArgs(5, SimplePTQL.EQ(), "-nodefault", Strategy.NOT_ESCAPE)
+							.addArgs(6, SimplePTQL.EQ(), "-nofirststartwizard", Strategy.NOT_ESCAPE)
+							.addArgs(7, SimplePTQL.EQ(), "-nolockcheck", Strategy.NOT_ESCAPE)
+							.addArgs(8, SimplePTQL.EQ(), "-nologo", Strategy.NOT_ESCAPE)
+							.addArgs(9, SimplePTQL.EQ(), "-norestore", Strategy.NOT_ESCAPE)
+							.createQuery();
+		
+		List<Long> find = new SimpleProcessManagerImpl().find(ptql);
+		Assert.assertTrue(find.size() == 1);
+		
+		MockOfficeTask task = new MockOfficeTask();
+        officeManager.execute(task);
+        assertTrue(task.isCompleted());
+        
+        officeManager.stop();
+        assertFalse(connection.isConnected());
+        assertFalse(process.isRunning());
+        assertEquals(process.getExitCode(0, 0), 0);
+    }
+    
     public void checkAcceptString() throws Exception {
     	PooledOfficeManager officeManager = new PooledOfficeManager(CONNECTION_MODE);
         ManagedOfficeProcess managedOfficeProcess = (ManagedOfficeProcess) ReflectionUtils.getPrivateField(officeManager, "managedOfficeProcess");
@@ -190,7 +230,6 @@ public class PooledOfficeManagerTest {
 		//Why doesn't this acceptstring contain \Q and \E but when running live does?
 		long[] pids = processFinder.find(PTQL + PlatformUtils.escapePTQLForRegex(unoUrl.getAcceptString()));
 		Assert.assertTrue(pids.length == 1);
-        
         MockOfficeTask task = new MockOfficeTask();
         officeManager.execute(task);
         assertTrue(task.isCompleted());
