@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 
 import org.artofsolving.jodconverter.util.PlatformUtils;
 
+import com.google.common.base.Preconditions;
+
 /**
  * A simplified PTQL so to simplify the query building and make it less error prone and typesafe. 
  * 
@@ -19,7 +21,7 @@ public class SimplePTQL {
 	private final String args;
 	private final Strategy strategy;
 	
-	protected enum Strategy {
+	public enum Strategy {
 		ESCAPE, NOT_ESCAPE
 	}
 
@@ -46,13 +48,14 @@ public class SimplePTQL {
 		}
 
 		public Builder addArgs(int argument, Operator operator, String searchValue, Strategy strategy) {
+			Preconditions.checkNotNull(searchValue);
+			
 			if(strategy == Strategy.ESCAPE) {
 				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
 			} else {
 				Pattern pattern = Pattern.compile(",|=");
 				Matcher matcher = pattern.matcher(searchValue);
-				if(matcher.find()) throw new IllegalArgumentException("searchValue cannot contain comma or equals sign. Either set Strategy.ESCAPE or remove it from the search value");
-				
+				Preconditions.checkArgument(!matcher.find(), "searchValue cannot contain comma or equals sign. Either set Strategy.ESCAPE or remove it from the search value");
 				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + searchValue);
 			}
 			
