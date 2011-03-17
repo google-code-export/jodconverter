@@ -26,4 +26,7 @@ public interface SimpleProcessManager {
 	 * @return - Returns an empty List if no results where found
 	 */
 	List<Long> find(SimplePTQL query) throws SigarException;
+	
+	
+	void kill(long pid, int signium) throws SigarException;
 }

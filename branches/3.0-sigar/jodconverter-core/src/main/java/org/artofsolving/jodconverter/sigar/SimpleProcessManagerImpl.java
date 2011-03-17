@@ -18,7 +18,8 @@ public class SimpleProcessManagerImpl implements SimpleProcessManager {
 	 * library loaded within the process Returns a Set of all the process id's that was found
 	 * 
 	 * @param query
-	 * @param searchValue - The value you want to search for
+	 * @param searchValue
+	 *            - The value you want to search for
 	 * @return - Returns immutable Set of process id's as long or an empty Set if no results where found
 	 * @see org.artofsolving.jodconverter.sigar.SimpleProcessManager#find(SimplePTQL)
 	 */
@@ -42,7 +43,6 @@ public class SimpleProcessManagerImpl implements SimpleProcessManager {
 	}
 
 	/**
-	 * 
 	 * @see org.artofsolving.jodconverter.sigar.SimpleProcessManager#findSingle(org.artofsolving.jodconverter.sigar.SimplePTQL)
 	 */
 	public Long findSingle(SimplePTQL ptlq) throws NonUniqueResultException, SigarException {
@@ -52,14 +52,23 @@ public class SimpleProcessManagerImpl implements SimpleProcessManager {
 			long[] find = processFinder.find(ptlq.getQuery());
 			if (find.length == 1) {
 				return Long.valueOf(find[0]);
-			} else if(find.length > 1) {
+			} else if (find.length > 1) {
 				throw new NonUniqueResultException("Found more than one process id");
 			}
 		} finally {
 			sigar.close();
 		}
-		
+
 		return Long.valueOf(0L);
+	}
+
+	public void kill(long pid, int signium) throws SigarException {
+		Sigar sigar = new Sigar();
+		try {
+			sigar.kill(pid, signium);
+		} finally {
+			sigar.close();
+		}
 	}
 
 }

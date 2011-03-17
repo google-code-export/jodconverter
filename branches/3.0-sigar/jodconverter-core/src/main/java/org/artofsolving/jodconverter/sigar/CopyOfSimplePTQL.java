@@ -9,50 +9,18 @@ import org.artofsolving.jodconverter.util.PlatformUtils;
  * 
  * @author Shervin Asgari - <a href="mailto:shervin@asgari.no">shervin@asgari.no</a>
  */
-public class SimplePTQL {
+public class CopyOfSimplePTQL {
+	// PTQL Syntax : Class.Attribute.operator=value
 	private final Operator operator;
 	private final Attribute attribute;
 	private final String searchValue;
-	private final String args;
-	private final Strategy strategy;
-	
-	protected enum Strategy {
-		ESCAPE, NOT_ESCAPE
-	}
 
-	private SimplePTQL(Attribute attribute, Operator operator, String searchValue, String args, Strategy strategy) {
+	public CopyOfSimplePTQL(Attribute attribute, Operator operator, String searchValue) {
 		this.attribute = attribute;
 		this.operator = operator;
 		this.searchValue = searchValue;
-		this.args = args;
-		this.strategy = strategy;
 	}
-	
-	public static class Builder {
-		private final Operator operator;
-		private final Attribute attribute;
-		private final String searchValue;
-		
-		private Strategy strategy = Strategy.NOT_ESCAPE; 
-		private StringBuilder args = new StringBuilder(""); //Default blank
-		
-		public Builder(Attribute attribute, Operator operator, String searchValue) {
-			this.attribute = attribute;
-			this.operator = operator;
-			this.searchValue = searchValue;
-		}
-		
-		public Builder addArgs(int argument, Operator operator, String searchValue) {
-			//The searchValue cannot contain comma or equals sign
-			args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
-			return this;
-		}
-		
-		public SimplePTQL createQuery() {
-			return new SimplePTQL(attribute, operator, searchValue, args.toString(), strategy);
-		}
-	}
-	
+
 	/**
 	 * Returns the entiry PTQL query.
 	 * ie: 
@@ -64,11 +32,18 @@ public class SimplePTQL {
 	 * @return
 	 */
 	public String getQuery() {
-		if(strategy == Strategy.NOT_ESCAPE)
-			return attribute.toString() + operator.toString() + searchValue + args;
-		else
-			return attribute.toString() + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue) + args;
-	}	
+		return attribute.toString() + operator.toString() + searchValue;
+	}
+
+	/**
+	 * Returns escaped query which is good for regex.
+	 * 
+	 * @see org.artofsolving.jodconverter.util.PlatformUtils#escapePTQLForRegex(String)
+	 * @return The escaped query
+	 */
+	public String getEscapedRegexQuery() {
+		return  PlatformUtils.escapePTQLForRegex(attribute.toString() + operator.toString() + searchValue);
+	}
 
 	private interface Operator {
 		String toString();
