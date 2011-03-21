@@ -14,11 +14,14 @@ import com.google.common.primitives.Longs;
 public class SimpleProcessManagerImpl implements SimpleProcessManager {
 
 	/**
-	 * Best to use for very simple queries <b>without<b> Args.* - Command line argument passed to the process Env.* - Environment variable within the process Modules.* Shared
-	 * library loaded within the process Returns a Set of all the process id's that was found
+	 * Best to use for simple queries. Does not support:
+	 * <ul>
+	 * <li>Env.* - Environment variable within the process</li> 
+	 * <li>Modules.* Shared library loaded within the process</li>
+	 * </ul> 
+	 * Returns a List of all the process id's that was found
 	 * 
-	 * @param query
-	 * @param searchValue - The value you want to search for
+	 * @param ptql
 	 * @return - Returns immutable List of process id's as Long or an empty List if no results where found
 	 * @see org.artofsolving.jodconverter.sigar.SimpleProcessManager#find(SimplePTQL)
 	 */
