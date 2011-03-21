@@ -1,7 +1,7 @@
 //
 // JODConverter - Java OpenDocument Converter
-// Copyright 2009 Art of Solving Ltd
-// Copyright 2004-2009 Mirko Nasato
+// Copyright 2011 Art of Solving Ltd
+// Copyright 2004-2011 Mirko Nasato
 //
 // JODConverter is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -21,7 +21,6 @@ package org.artofsolving.jodconverter.office;
 
 import java.io.File;
 
-import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.SigarProcessManager;
 
 import com.google.common.base.Preconditions;
@@ -37,7 +36,6 @@ public class DefaultOfficeManagerConfiguration {
     private long taskQueueTimeout = 30000L;  // 30 seconds
     private long taskExecutionTimeout = 120000L;  // 2 minutes
     private int maxTasksPerProcess = 200;
-    private ProcessManager processManager = null;  // lazily initialised
 
     public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
         Preconditions.checkNotNull("officeHome", officeHome);
@@ -110,13 +108,7 @@ public class DefaultOfficeManagerConfiguration {
         return this;
     }
 
-    public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager) throws NullPointerException {
-        Preconditions.checkNotNull("processManager", processManager);
-        this.processManager = processManager;
-        return this;
-    }
-    
-    public OfficeManager buildOfficeManager() throws IllegalStateException {
+   public OfficeManager buildOfficeManager() throws IllegalStateException {
         if (!officeHome.isDirectory()) {
             throw new IllegalStateException("officeHome doesn't exist or is not a directory: " + officeHome);
         } else if (!OfficeUtils.getOfficeExecutable(officeHome).isFile()) {
@@ -126,16 +118,12 @@ public class DefaultOfficeManagerConfiguration {
             throw new IllegalStateException("invalid templateProfileDir: " + templateProfileDir);
         }
         
-        if (processManager == null) {
-            processManager = new SigarProcessManager();
-        }
-        
         int numInstances = connectionProtocol == OfficeConnectionProtocol.PIPE ? pipeNames.length : portNumbers.length;
         UnoUrl[] unoUrls = new UnoUrl[numInstances];
         for (int i = 0; i < numInstances; i++) {
             unoUrls[i] = (connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i]) : UnoUrl.socket(portNumbers[i]);
         }
-        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, processManager);
+        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, new SigarProcessManager());
     }
 
         private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {

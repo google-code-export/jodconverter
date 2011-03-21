@@ -1,7 +1,7 @@
 //
 // JODConverter - Java OpenDocument Converter
-// Copyright 2009 Art of Solving Ltd
-// Copyright 2004-2009 Mirko Nasato
+// Copyright 2011 Art of Solving Ltd
+// Copyright 2004-2011 Mirko Nasato
 //
 // JODConverter is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -40,7 +40,7 @@ public class PlatformUtils {
     }
     
     /**
-     * This method will escape Comma (,) and Equals sign (=) to Period (.)
+     * This method will escape Comma (,) to Period (.)
      * Because the PTQL cannot escape those correctly, so we will use '.' in regular expression.
      * We also have to remove \Q and \E because they are not correctly interpreted as literal characters
      * 
@@ -51,6 +51,6 @@ public class PlatformUtils {
      * @return - The escaped string
      */
     public static String escapePTQLForRegex(String s) {
-    	return s.replaceAll(",|=", ".").replaceAll("\\\\Q|\\\\E", "");
+    	return s.replaceAll(",", ".").replaceAll("\\\\Q|\\\\E", "");
     }
 }
