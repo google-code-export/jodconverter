@@ -26,11 +26,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
-import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.artofsolving.jodconverter.process.ProcessManager;
+import org.artofsolving.jodconverter.sigar.NonUniqueResultException;
+import org.artofsolving.jodconverter.sigar.SimplePTQL;
+import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
+import org.hyperic.sigar.SigarException;
 
 class OfficeProcess {
 
@@ -42,7 +45,7 @@ class OfficeProcess {
     private final ProcessManager processManager;
 
     private Process process;
-    private String pid;
+    private Long pid;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
@@ -55,11 +58,13 @@ class OfficeProcess {
         this.processManager = processManager;
     }
 
-    public void start() throws IOException {
-    	String processRegex = "soffice.*" + Pattern.quote(unoUrl.getAcceptString());
-        String existingPid = processManager.findPid(processRegex);
-    	if (existingPid != null) {
-			throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid %s", unoUrl.getAcceptString(), existingPid));
+    public void start() throws SigarException, IOException {
+    	SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "soffice.*")
+		.addArgs(1, SimplePTQL.RE(),unoUrl.getAcceptString(), Strategy.ESCAPE)
+		.createQuery();
+        List<Long> existingPids = processManager.find(ptql);
+    	if (!existingPids.isEmpty()) {
+			throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid %s", unoUrl.getAcceptString(), existingPids.get(0)));
         }
         prepareInstanceProfileDir();
         List<String> command = new ArrayList<String>();
@@ -83,10 +88,14 @@ class OfficeProcess {
         }
         logger.info(String.format("starting process with acceptString '%s' and profileDir '%s'", unoUrl, instanceProfileDir));
         process = processBuilder.start();
-        pid = processManager.findPid(processRegex);
+        try {
+			pid = processManager.findSingle(ptql);
+		} catch (NonUniqueResultException e) {
+			throw new SigarException(String.format("Found multiple processes with the ptql query '%s'", ptql.getQuery()));
+		}
         logger.info("started process" + (pid != null ? "; pid = " + pid : ""));
     }
-
+    
     private File getInstanceProfileDir(UnoUrl unoUrl) {
         String dirName = ".jodconverter_" + unoUrl.getAcceptString().replace(',', '_').replace('=', '-');
         return new File(System.getProperty("java.io.tmpdir"), dirName);
@@ -191,9 +200,9 @@ class OfficeProcess {
         }
     }
 
-    public int forciblyTerminate(long retryInterval, long retryTimeout) throws IOException, RetryTimeoutException {
+    public int forciblyTerminate(long retryInterval, long retryTimeout) throws RetryTimeoutException, SigarException {
         logger.info(String.format("trying to forcibly terminate process: '" + unoUrl + "'" + (pid != null ? " (pid " + pid  + ")" : "")));
-        processManager.kill(process, pid);
+        processManager.kill(pid, 9);
         return getExitCode(retryInterval, retryTimeout);
     }
 

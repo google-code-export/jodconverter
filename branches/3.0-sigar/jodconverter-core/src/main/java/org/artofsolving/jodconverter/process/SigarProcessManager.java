@@ -1,36 +1,18 @@
-//
-// JODConverter - Java OpenDocument Converter
-// Copyright 2009 Art of Solving Ltd
-// Copyright 2004-2009 Mirko Nasato
-//
-// JODConverter is free software: you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public License
-// as published by the Free Software Foundation, either version 3 of
-// the License, or (at your option) any later version.
-//
-// JODConverter is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-// Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General
-// Public License along with JODConverter.  If not, see
-// <http://www.gnu.org/licenses/>.
-//
 package org.artofsolving.jodconverter.process;
 
-import java.io.IOException;
+import java.util.List;
 
-import org.artofsolving.jodconverter.util.PlatformUtils;
+import org.artofsolving.jodconverter.sigar.NonUniqueResultException;
+import org.artofsolving.jodconverter.sigar.SimplePTQL;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
 import org.hyperic.sigar.ptql.ProcessFinder;
 
+import com.google.common.primitives.Longs;
+
 /**
  * {@link ProcessManager} implementation for "all" systems. Uses Sigar which 
  * provides a portable interface for gathering system information with native libraries. 
- * 
- * TODO: SimpleProcessManager?? due to a lack of a better name
  * 
  * Use the following native files on the system you are using.
  * For example, minimal requirements to use the SIGAR Java API on Windows would be sigar.jar and sigar-x86-winnt.dll
@@ -60,59 +42,58 @@ import org.hyperic.sigar.ptql.ProcessFinder;
  * 
  * See link for more information
  * {@link http://support.hyperic.com/display/SIGAR/Home#Home-license}
+ * 
+ * @author Shervin Asgari - <a href="mailto:shervin.asgari@redpill-linpro.com">shervin@redpill-linpro.com</a>
  */
 public class SigarProcessManager implements ProcessManager {
-	private static final String STATE_NAME = "State.Name.re=";
-	private static final String OFFICE = "office.*";
-	private static final String ARGS = ",Args.1.re=.*";
 
 	/**
-	 * Returns the process id if found, or null if not found
+	 * Best to use for simple queries. Does not support:
+	 * <ul>
+	 * <li>Env.* - Environment variable within the process</li> 
+	 * <li>Modules.* Shared library loaded within the process</li>
+	 * </ul> 
+	 * Returns a List of all the process id's that was found
+	 * 
+	 * @param ptql
+	 * @return - Returns immutable List of process id's as Long or an empty List if no results where found
+	 * @see org.artofsolving.jodconverter.sigar.SimpleProcessManager#find(SimplePTQL)
 	 */
-	public String findPid(String regex) throws IOException {
-		StringBuilder sb = new StringBuilder(STATE_NAME);
-		
-		int index = regex.indexOf(OFFICE);
-		
-		if( index == 0) {
-			int index2 = regex.indexOf(regex.replace(OFFICE, ""));
-			sb.append(regex.substring(0,index2))
-			.append(ARGS)
-			.append(PlatformUtils.escapePTQLForRegex(regex.substring(index2)));
-		} else {
-			//Normal find without the args
-			sb.append(PlatformUtils.escapePTQLForRegex(regex));
-		}
-		
-		//TODO: We need to find out how to best instansiate and close sigar
+	public List<Long> find(SimplePTQL ptql) throws SigarException {
 		Sigar sigar = new Sigar();
-		ProcessFinder processFinder = new ProcessFinder(sigar);
 		try {
-			//'re' (Regular expression)
-			//Alternatively we can use ct - Contains value (substring)
-			//long[] pids = processFinder.find("State.Name.ct=" + regex);
-			long[] pids = processFinder.find(sb.toString());
-			if(pids.length > 0) {
-				//Return the first or give error if there are more than one processes found?
-				return String.valueOf(pids[0]);
-			}
-		} catch (SigarException e) {
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
+			ProcessFinder processFinder = new ProcessFinder(sigar);
+			long[] find = processFinder.find(ptql.getQuery());
+			return Longs.asList(find);
 		} finally {
 			sigar.close();
 		}
-		
-		return null;
 	}
 
-	public void kill(Process process, String pid) throws IOException {
+	/**
+	 * @see org.artofsolving.jodconverter.sigar.SimpleProcessManager#findSingle(org.artofsolving.jodconverter.sigar.SimplePTQL)
+	 */
+	public Long findSingle(SimplePTQL ptql) throws NonUniqueResultException, SigarException {
 		Sigar sigar = new Sigar();
 		try {
-			sigar.kill(pid, 9);
-		} catch (SigarException e) {
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
+			ProcessFinder processFinder = new ProcessFinder(sigar);
+			long[] find = processFinder.find(ptql.getQuery());
+			if (find.length == 1) {
+				return Long.valueOf(find[0]);
+			} else if (find.length > 1) {
+				throw new NonUniqueResultException("Found more than one process id");
+			}
+		} finally {
+			sigar.close();
+		}
+
+		return 0L;
+	}
+
+	public void kill(long pid, int signium) throws SigarException {
+		Sigar sigar = new Sigar();
+		try {
+			sigar.kill(pid, signium);
 		} finally {
 			sigar.close();
 		}

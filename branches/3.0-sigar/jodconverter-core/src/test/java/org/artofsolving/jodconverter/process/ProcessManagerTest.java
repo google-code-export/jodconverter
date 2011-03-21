@@ -20,9 +20,8 @@
 package org.artofsolving.jodconverter.process;
 
 import org.artofsolving.jodconverter.ReflectionUtils;
+import org.artofsolving.jodconverter.sigar.SimplePTQL;
 import org.artofsolving.jodconverter.util.PlatformUtils;
-import org.hyperic.sigar.Sigar;
-import org.hyperic.sigar.ptql.ProcessFinder;
 import org.testng.Assert;
 import org.testng.SkipException;
 import org.testng.annotations.Test;
@@ -30,32 +29,6 @@ import org.testng.annotations.Test;
 @Test
 public class ProcessManagerTest {
 
-    public void unixProcessManager() throws Exception {
-        if (PlatformUtils.isMac() || PlatformUtils.isWindows()) {
-            throw new SkipException("UnixProcessManager only works on Unix");
-        }
-        ProcessManager processManager = new UnixProcessManager();
-        Process process = new ProcessBuilder("sleep", "5s").start();
-        String pid = processManager.findPid("sleep 5s");
-        Assert.assertNotNull(pid);
-        Assert.assertEquals(pid, ReflectionUtils.getPrivateField(process, "pid").toString());
-        processManager.kill(process, pid);
-        Assert.assertNull(processManager.findPid("sleep 5s"));
-    }
-
-    public void macProcessManager() throws Exception {
-        if (!PlatformUtils.isMac()) {
-            throw new SkipException("MacProcessManager only works on Mac");
-        }
-        ProcessManager processManager = new MacProcessManager();
-        Process process = new ProcessBuilder("sleep", "5s").start();
-        String pid = processManager.findPid("sleep 5s");
-        Assert.assertNotNull(pid);
-        Assert.assertEquals(pid, ReflectionUtils.getPrivateField(process, "pid").toString());
-        processManager.kill(process, pid);
-        Assert.assertNull(processManager.findPid("sleep 5s"));
-    }
-    
     public void sigarProcessManager() throws Exception {
     	if (PlatformUtils.isWindows()) {
 			throw new SkipException("Sleep only works on unix");
@@ -64,40 +37,15 @@ public class ProcessManagerTest {
     	ProcessManager processManager = new SigarProcessManager();
     	//Difference between unix and sigar is that sigar's find will return the 'basename' of the process 
         Process process = new ProcessBuilder("sleep", "60s").start();
-        String pid = processManager.findPid("sleep");
         
-        Assert.assertNotNull(pid);
-        Assert.assertEquals(pid, ReflectionUtils.getPrivateField(process, "pid").toString());
-        processManager.kill(process, pid);
-        Assert.assertNull(processManager.findPid("sleep"));
+        SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "sleep").createQuery();
+        Long pid = processManager.findSingle(ptql);
+        Assert.assertTrue(pid.longValue() > 0L);
+        Assert.assertEquals(pid.toString(), ReflectionUtils.getPrivateField(process, "pid").toString());
+        processManager.kill(pid, 9);
+        
+        Long findSingle = processManager.findSingle(ptql);
+        Assert.assertEquals(findSingle, Long.valueOf(0L));
     }
-
-    public void processFinder() throws Exception {
-		if (PlatformUtils.isWindows()) {
-			throw new SkipException("Sleep only works on unix");
-		}
-
-		Sigar sigar = new Sigar();
-		ProcessFinder pf = new ProcessFinder(sigar);
-
-		long[] find = pf.find("State.Name.eq=java");
-		Assert.assertFalse(find.length == 0);
-
-		Process process = new ProcessBuilder("sleep", "5s").start();
-		Assert.assertNotNull(process);
-		// long[] sleep = pf.find("State.Name.eq=sleep"); //equals
-		long[] sleep = pf.find("State.Name.sw=sleep"); // Starts with
-		Assert.assertEquals(sleep.length, 1);
-
-		long pidById = pf.findSingleProcess("Pid.Pid.eq=" + String.valueOf(sleep[0]));
-		Assert.assertEquals(pidById, sleep[0]);
-
-		ProcessManager processManager = new SigarProcessManager();
-		processManager.kill(process, String.valueOf(sleep[0]));
-
-		long[] sleep2 = pf.find("State.Name.sw=sleep"); // Starts with
-		Assert.assertTrue(sleep2.length == 0);
-		sigar.close();
-	}
-
+    
 }

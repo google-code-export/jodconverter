@@ -19,12 +19,37 @@
 //
 package org.artofsolving.jodconverter.process;
 
-import java.io.IOException;
+import java.util.List;
+
+import org.artofsolving.jodconverter.sigar.NonUniqueResultException;
+import org.artofsolving.jodconverter.sigar.SimplePTQL;
+import org.hyperic.sigar.SigarException;
 
 public interface ProcessManager {
 
-    void kill(Process process, String pid) throws IOException;
-
-    String findPid(String regex) throws IOException;
+	/**
+	 * Returns the process id of a single result
+	 * @param query
+	 * @param searchValue - The value you want to search for
+	 * @return Returns the process id. Will throw exception if multiple results are found.
+	 * Will return 0L if no results where found
+	 */
+	Long findSingle(SimplePTQL query) throws NonUniqueResultException, SigarException;
+	
+	/**
+	 * Best to use for simple queries. Does not support:
+	 * <ul>
+	 * <li>Env.* - Environment variable within the process</li> 
+	 * <li>Modules.* Shared library loaded within the process</li>
+	 * </ul> 
+	 * Returns a List of all the process id's that was found
+	 * 
+	 * @param ptql
+	 * @return - Returns immutable List of process id's as Long or an empty List if no results where found
+	 */
+	List<Long> find(SimplePTQL query) throws SigarException;
+	
+	
+	void kill(long pid, int signium) throws SigarException;
 
 }

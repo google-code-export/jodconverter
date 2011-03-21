@@ -22,7 +22,7 @@ package org.artofsolving.jodconverter.office;
 import static org.testng.Assert.assertTrue;
 
 import org.artofsolving.jodconverter.ReflectionUtils;
-import org.artofsolving.jodconverter.process.PureJavaProcessManager;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.testng.annotations.Test;
 
 @Test(groups="integration")
@@ -30,7 +30,7 @@ public class ExternalOfficeManagerTest {
 
     public void executeTask() throws Exception {
         UnoUrl unoUrl = UnoUrl.socket(2002);
-        OfficeProcess officeProcess = new OfficeProcess(OfficeUtils.getDefaultOfficeHome(), unoUrl, null, null, new PureJavaProcessManager());
+        OfficeProcess officeProcess = new OfficeProcess(OfficeUtils.getDefaultOfficeHome(), unoUrl, null, null, new SigarProcessManager());
         officeProcess.start();
         Thread.sleep(2000);
         
