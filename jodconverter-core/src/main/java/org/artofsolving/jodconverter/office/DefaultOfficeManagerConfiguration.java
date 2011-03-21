@@ -21,12 +21,10 @@ package org.artofsolving.jodconverter.office;
 
 import java.io.File;
 
-import org.artofsolving.jodconverter.process.MacProcessManager;
 import org.artofsolving.jodconverter.process.ProcessManager;
-import org.artofsolving.jodconverter.process.PureJavaProcessManager;
-import org.artofsolving.jodconverter.process.UnixProcessManager;
-import org.artofsolving.jodconverter.process.WindowsProcessManager;
-import org.artofsolving.jodconverter.util.PlatformUtils;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
+
+import com.google.common.base.Preconditions;
 
 public class DefaultOfficeManagerConfiguration {
 
@@ -42,19 +40,19 @@ public class DefaultOfficeManagerConfiguration {
     private ProcessManager processManager = null;  // lazily initialised
 
     public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
-        checkArgumentNotNull("officeHome", officeHome);
+        Preconditions.checkNotNull("officeHome", officeHome);
         return setOfficeHome(new File(officeHome));
     }
 
     public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException, IllegalArgumentException  {
-        checkArgumentNotNull("officeHome", officeHome);
+        Preconditions.checkNotNull("officeHome", officeHome);
         checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
         this.officeHome = officeHome;
         return this;
     }
 
     public DefaultOfficeManagerConfiguration setConnectionProtocol(OfficeConnectionProtocol connectionProtocol) throws NullPointerException {
-        checkArgumentNotNull("connectionProtocol", connectionProtocol);
+        Preconditions.checkNotNull("connectionProtocol", connectionProtocol);
         this.connectionProtocol = connectionProtocol;
         return this;
     }
@@ -65,20 +63,20 @@ public class DefaultOfficeManagerConfiguration {
     }
 
     public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException, IllegalArgumentException {
-        checkArgumentNotNull("portNumbers", portNumbers);
+        Preconditions.checkNotNull("portNumbers", portNumbers);
         checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
         this.portNumbers = portNumbers;
         return this;
     }
 
     public DefaultOfficeManagerConfiguration setPipeName(String pipeName) throws NullPointerException {
-        checkArgumentNotNull("pipeName", pipeName);
+        Preconditions.checkNotNull("pipeName", pipeName);
         this.pipeNames = new String[] { pipeName };
         return this;
     }
 
     public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException, IllegalArgumentException {
-        checkArgumentNotNull("pipeNames", pipeNames);
+        Preconditions.checkNotNull("pipeNames", pipeNames);
         checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
         this.pipeNames = pipeNames;
         return this;
@@ -113,11 +111,11 @@ public class DefaultOfficeManagerConfiguration {
     }
 
     public DefaultOfficeManagerConfiguration setProcessManager(ProcessManager processManager) throws NullPointerException {
-        checkArgumentNotNull("processManager", processManager);
+        Preconditions.checkNotNull("processManager", processManager);
         this.processManager = processManager;
         return this;
     }
-
+    
     public OfficeManager buildOfficeManager() throws IllegalStateException {
         if (!officeHome.isDirectory()) {
             throw new IllegalStateException("officeHome doesn't exist or is not a directory: " + officeHome);
@@ -129,7 +127,7 @@ public class DefaultOfficeManagerConfiguration {
         }
         
         if (processManager == null) {
-            processManager = findBestProcessManager();
+            processManager = new SigarProcessManager();
         }
         
         int numInstances = connectionProtocol == OfficeConnectionProtocol.PIPE ? pipeNames.length : portNumbers.length;
@@ -140,32 +138,7 @@ public class DefaultOfficeManagerConfiguration {
         return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, processManager);
     }
 
-    private ProcessManager findBestProcessManager() {
-        if (PlatformUtils.isLinux()) {
-        	UnixProcessManager unixProcessManager = new UnixProcessManager();
-        	if (runAsArgs != null) {
-        		unixProcessManager.setRunAsArgs(runAsArgs);
-        	}
-        	return unixProcessManager;
-        } else  if (PlatformUtils.isMac()) {
-            return new MacProcessManager();
-        } else if (PlatformUtils.isWindows()) {
-            WindowsProcessManager windowsProcessManager = new WindowsProcessManager();
-            return windowsProcessManager.isUsable() ? windowsProcessManager : new PureJavaProcessManager();
-        } else {
-            // NOTE: UnixProcessManager can't be trusted to work on Solaris
-            // because of the 80-char limit on ps output there  
-            return new PureJavaProcessManager();
-        }
-    }
-
-    private void checkArgumentNotNull(String argName, Object argValue) throws NullPointerException {
-        if (argValue == null) {
-            throw new NullPointerException(argName + " must not be null");
-        }
-    }
-
-    private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {
+        private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {
         if (!condition) {
             throw new IllegalArgumentException(argName + " " + message);
         }

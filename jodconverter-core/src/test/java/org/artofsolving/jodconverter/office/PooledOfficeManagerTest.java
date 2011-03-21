@@ -30,8 +30,8 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeoutException;
 
 import org.artofsolving.jodconverter.ReflectionUtils;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.artofsolving.jodconverter.sigar.SimplePTQL;
-import org.artofsolving.jodconverter.sigar.SimpleProcessManagerImpl;
 import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 import org.hyperic.sigar.Sigar;
@@ -200,7 +200,7 @@ public class PooledOfficeManagerTest {
 							.addArgs(9, SimplePTQL.EQ(), "-norestore", Strategy.NOT_ESCAPE)
 							.createQuery();
 		
-		List<Long> find = new SimpleProcessManagerImpl().find(ptql);
+		List<Long> find = new SigarProcessManager().find(ptql);
 		Assert.assertTrue(find.size() == 1);
 		
 		MockOfficeTask task = new MockOfficeTask();

@@ -21,6 +21,8 @@ package org.artofsolving.jodconverter.sigar;
 
 import java.util.List;
 
+import org.artofsolving.jodconverter.process.ProcessManager;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
 import org.testng.Assert;
@@ -31,7 +33,7 @@ import org.testng.annotations.Test;
 public class SimplePTQLTest {
 	
 	public void simpleQuery() throws Exception {
-		SimpleProcessManager spm = new SimpleProcessManagerImpl();
+		ProcessManager spm = new SigarProcessManager();
 		SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "java").createQuery();
 		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=java");
 		
@@ -96,7 +98,7 @@ public class SimplePTQLTest {
         					.addArgs(1, SimplePTQL.EQ(), "60s", Strategy.NOT_ESCAPE).createQuery();
         
         
-        SimpleProcessManager spm = new SimpleProcessManagerImpl();
+        ProcessManager spm = new SigarProcessManager();
         Long findSingle = spm.findSingle(ptql);
         Assert.assertTrue(findSingle > 0L);
         

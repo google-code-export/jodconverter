@@ -22,7 +22,7 @@ package org.artofsolving.jodconverter.office;
 import java.io.File;
 
 import org.artofsolving.jodconverter.process.ProcessManager;
-import org.artofsolving.jodconverter.process.PureJavaProcessManager;
+import org.artofsolving.jodconverter.process.SigarProcessManager;
 
 class ManagedOfficeProcessSettings {
 
@@ -33,7 +33,7 @@ class ManagedOfficeProcessSettings {
     private File officeHome = OfficeUtils.getDefaultOfficeHome();
     private String[] runAsArgs;
     private File templateProfileDir;
-    private ProcessManager processManager = new PureJavaProcessManager();
+    private ProcessManager processManager = new SigarProcessManager();
     private long retryTimeout = DEFAULT_RETRY_TIMEOUT;
     private long retryInterval = DEFAULT_RETRY_INTERVAL;
 
