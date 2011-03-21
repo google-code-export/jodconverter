@@ -1,7 +1,7 @@
 //
 // JODConverter - Java OpenDocument Converter
-// Copyright 2009 Art of Solving Ltd
-// Copyright 2004-2009 Mirko Nasato
+// Copyright 2011 Art of Solving Ltd
+// Copyright 2004-2011 Mirko Nasato
 //
 // JODConverter is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -70,11 +70,11 @@ public class SimplePTQLTest {
 		
 		ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "office.*")
 		.addArgs(1, SimplePTQL.RE(), "\\Qpipe,name,office1\\E", Strategy.ESCAPE)
-		.addArgs(2, SimplePTQL.EQ(), "\\Qpipe,name,office2\\E", Strategy.ESCAPE)
+		.addArgs(2, SimplePTQL.EQ(), "\\Qpipe,name=office2\\E", Strategy.ESCAPE)
 		.setStrategy(Strategy.ESCAPE)
 		.createQuery();
 		
-		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=office.*,Args.1.re=pipe.name.office1,Args.2.eq=pipe.name.office2");
+		Assert.assertEquals(ptql.getQuery(), "State.Name.eq=office.*,Args.1.re=pipe.name.office1,Args.2.eq=pipe.name=office2");
 		
 		try {
 			ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.EQ(), "office.*")

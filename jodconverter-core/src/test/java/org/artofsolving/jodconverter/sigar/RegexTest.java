@@ -1,7 +1,7 @@
 //
 // JODConverter - Java OpenDocument Converter
-// Copyright 2009 Art of Solving Ltd
-// Copyright 2004-2009 Mirko Nasato
+// Copyright 2011 Art of Solving Ltd
+// Copyright 2004-2011 Mirko Nasato
 //
 // JODConverter is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
@@ -29,7 +29,7 @@ public class RegexTest {
 	public void escapePTQL() throws Exception {
 		final String regex = "\\Qpipe,name=office1\\E";
 		String newVal = PlatformUtils.escapePTQLForRegex(regex);
-		Assert.assertEquals(newVal, "pipe.name.office1");
+		Assert.assertEquals(newVal, "pipe.name=office1");
 
 		String part1 = "office.*";
 		String whole = part1 + regex;
@@ -56,7 +56,7 @@ public class RegexTest {
 		Assert.assertEquals(index, 0);
 		int index2 = regex.indexOf(regex.replace(OFFICE, ""));
 		sb.append(regex.substring(0, index2)).append(ARGS).append(PlatformUtils.escapePTQLForRegex(regex.substring(index2)));
-		Assert.assertEquals(sb.toString(), "State.Name.re=office.*,Args.1.re=.*pipe.name.office1");
+		Assert.assertEquals(sb.toString(), "State.Name.re=office.*,Args.1.re=.*pipe.name=office1");
 
 		sb = new StringBuilder(STATE_NAME);
 		regex = "\\Qpipe,name=office1\\E";
@@ -64,7 +64,7 @@ public class RegexTest {
 		Assert.assertEquals(index, -1);
 		sb.append(OFFICE).append(ARGS).append(PlatformUtils.escapePTQLForRegex(regex));
 
-		Assert.assertEquals(sb.toString(), "State.Name.re=office.*,Args.1.re=.*pipe.name.office1");
+		Assert.assertEquals(sb.toString(), "State.Name.re=office.*,Args.1.re=.*pipe.name=office1");
 
 	}
 }
