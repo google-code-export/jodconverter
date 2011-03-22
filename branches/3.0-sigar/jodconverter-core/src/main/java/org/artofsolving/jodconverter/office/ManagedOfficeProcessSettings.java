@@ -36,6 +36,7 @@ class ManagedOfficeProcessSettings {
     private ProcessManager processManager = new SigarProcessManager();
     private long retryTimeout = DEFAULT_RETRY_TIMEOUT;
     private long retryInterval = DEFAULT_RETRY_INTERVAL;
+    private boolean autokillOpenPipes = false;
 
     public ManagedOfficeProcessSettings(UnoUrl unoUrl) {
         this.unoUrl = unoUrl;
@@ -91,6 +92,14 @@ class ManagedOfficeProcessSettings {
 
     public void setRetryInterval(long retryInterval) {
         this.retryInterval = retryInterval;
+    }
+    
+    public boolean isAutokillOpenPipes() {
+    	return autokillOpenPipes;
+    }
+    	 
+    public void setAutokillOpenPipes(boolean autokillOpenPipes) {
+    	this.autokillOpenPipes = autokillOpenPipes;
     }
 
 }

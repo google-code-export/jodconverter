@@ -17,7 +17,7 @@
 // Public License along with JODConverter.  If not, see
 // <http://www.gnu.org/licenses/>.
 //
-package org.artofsolving.jodconverter.sigar;
+package org.artofsolving.jodconverter.process;
 
 /**
  * 

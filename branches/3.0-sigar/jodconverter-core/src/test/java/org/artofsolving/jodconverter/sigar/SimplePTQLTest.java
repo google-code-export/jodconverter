@@ -21,6 +21,7 @@ package org.artofsolving.jodconverter.sigar;
 
 import java.util.List;
 
+import org.artofsolving.jodconverter.process.NonUniqueResultException;
 import org.artofsolving.jodconverter.process.ProcessManager;
 import org.artofsolving.jodconverter.process.SigarProcessManager;
 import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
