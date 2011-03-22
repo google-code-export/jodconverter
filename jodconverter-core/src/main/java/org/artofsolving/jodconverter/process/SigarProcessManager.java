@@ -21,7 +21,6 @@ package org.artofsolving.jodconverter.process;
 
 import java.util.List;
 
-import org.artofsolving.jodconverter.sigar.NonUniqueResultException;
 import org.artofsolving.jodconverter.sigar.SimplePTQL;
 import org.hyperic.sigar.Sigar;
 import org.hyperic.sigar.SigarException;
@@ -106,7 +105,7 @@ public class SigarProcessManager implements ProcessManager {
 			sigar.close();
 		}
 
-		return 0L;
+		return Long.valueOf(0L);
 	}
 
 	public void kill(long pid, int signium) throws SigarException {

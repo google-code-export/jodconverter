@@ -36,6 +36,7 @@ public class DefaultOfficeManagerConfiguration {
     private long taskQueueTimeout = 30000L;  // 30 seconds
     private long taskExecutionTimeout = 120000L;  // 2 minutes
     private int maxTasksPerProcess = 200;
+    private boolean autokillOpenPipes = false;
 
     public DefaultOfficeManagerConfiguration setOfficeHome(String officeHome) throws NullPointerException, IllegalArgumentException {
         Preconditions.checkNotNull("officeHome", officeHome);
@@ -107,6 +108,16 @@ public class DefaultOfficeManagerConfiguration {
         this.maxTasksPerProcess = maxTasksPerProcess;
         return this;
     }
+    
+   /**
+   * NB! This should only be used in development. This is because if two applications accidentally start 
+   * using the same OOo pipe name. The second app would kill the OOo process started by the first app.
+   * @param autokillOpenPipes 
+   */
+   public DefaultOfficeManagerConfiguration setAutokillOpenPipes(boolean autokillOpenPipes) {
+	   this.autokillOpenPipes = autokillOpenPipes;
+	   return this;
+   }
 
    public OfficeManager buildOfficeManager() throws IllegalStateException {
         if (!officeHome.isDirectory()) {
@@ -123,7 +134,7 @@ public class DefaultOfficeManagerConfiguration {
         for (int i = 0; i < numInstances; i++) {
             unoUrls[i] = (connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i]) : UnoUrl.socket(portNumbers[i]);
         }
-        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, new SigarProcessManager());
+        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, autokillOpenPipes, new SigarProcessManager());
     }
 
         private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {

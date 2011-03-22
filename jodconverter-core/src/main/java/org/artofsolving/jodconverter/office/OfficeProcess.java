@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
+import org.artofsolving.jodconverter.process.NonUniqueResultException;
 import org.artofsolving.jodconverter.process.ProcessManager;
-import org.artofsolving.jodconverter.sigar.NonUniqueResultException;
 import org.artofsolving.jodconverter.sigar.SimplePTQL;
 import org.artofsolving.jodconverter.sigar.SimplePTQL.Strategy;
 import org.artofsolving.jodconverter.util.PlatformUtils;
@@ -43,18 +43,20 @@ class OfficeProcess {
     private final File templateProfileDir;
     private final File instanceProfileDir;
     private final ProcessManager processManager;
-
+    private final boolean autokillOpenPipes;
+    
     private Process process;
     private Long pid;
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    public OfficeProcess(File officeHome, UnoUrl unoUrl, String[] runAsArgs, File templateProfileDir, ProcessManager processManager) {
+    public OfficeProcess(File officeHome, UnoUrl unoUrl, String[] runAsArgs, File templateProfileDir, boolean autokillOpenPipes, ProcessManager processManager) {
         this.officeHome = officeHome;
         this.unoUrl = unoUrl;
         this.runAsArgs = runAsArgs;
         this.templateProfileDir = templateProfileDir;
         this.instanceProfileDir = getInstanceProfileDir(unoUrl);
+        this.autokillOpenPipes = autokillOpenPipes;
         this.processManager = processManager;
     }
 
@@ -62,9 +64,19 @@ class OfficeProcess {
     	SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "soffice.*")
 		.addArgs(1, SimplePTQL.RE(),unoUrl.getAcceptString(), Strategy.ESCAPE)
 		.createQuery();
-        List<Long> existingPids = processManager.find(ptql);
-    	if (!existingPids.isEmpty()) {
-			throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid %s", unoUrl.getAcceptString(), existingPids.get(0)));
+        long existingPid = 0L;
+		try {
+			existingPid = processManager.findSingle(ptql).longValue();
+		} catch (NonUniqueResultException e1) {
+			throw new IllegalStateException(String.format("More than one process with the acceptString '%s' is running", unoUrl.getAcceptString()));
+		}
+    	if (existingPid > 0L) {
+    		if(autokillOpenPipes) {
+    			processManager.kill(existingPid, 9);
+        	} else {        	
+        		throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid '%s'", unoUrl.getAcceptString(), existingPid));
+        	}
+			throw new IllegalStateException(String.format("a process with acceptString '%s' is already running; pid '%s'", unoUrl.getAcceptString(), existingPid));
         }
         prepareInstanceProfileDir();
         List<String> command = new ArrayList<String>();
