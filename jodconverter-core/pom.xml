@@ -143,8 +143,7 @@
     	<executions>
       		<execution>
 	        	<id>unpack-dependencies</id>
-	        	<!-- <phase>package</phase> -->
-	        	<phase>validate</phase>
+	        	<phase>compile</phase>
 	        	<goals>
 	          		<goal>unpack-dependencies</goal>
 	        	</goals>

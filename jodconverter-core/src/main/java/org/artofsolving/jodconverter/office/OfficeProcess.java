@@ -50,12 +50,12 @@ class OfficeProcess {
 
     private final Logger logger = Logger.getLogger(getClass().getName());
 
-    public OfficeProcess(File officeHome, UnoUrl unoUrl, String[] runAsArgs, File templateProfileDir, boolean autokillOpenPipes, ProcessManager processManager) {
+    public OfficeProcess(File officeHome, UnoUrl unoUrl, String[] runAsArgs, File templateProfileDir, File instanceProfileDir, boolean autokillOpenPipes, ProcessManager processManager) {
         this.officeHome = officeHome;
         this.unoUrl = unoUrl;
         this.runAsArgs = runAsArgs;
         this.templateProfileDir = templateProfileDir;
-        this.instanceProfileDir = getInstanceProfileDir(unoUrl);
+        this.instanceProfileDir = instanceProfileDir == null ? getInstanceProfileDir(unoUrl) : instanceProfileDir; 
         this.autokillOpenPipes = autokillOpenPipes;
         this.processManager = processManager;
     }

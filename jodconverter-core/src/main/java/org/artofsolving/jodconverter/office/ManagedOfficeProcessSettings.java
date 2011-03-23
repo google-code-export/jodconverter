@@ -33,6 +33,7 @@ class ManagedOfficeProcessSettings {
     private File officeHome = OfficeUtils.getDefaultOfficeHome();
     private String[] runAsArgs;
     private File templateProfileDir;
+    private File instanceProfileDir;
     private ProcessManager processManager = new SigarProcessManager();
     private long retryTimeout = DEFAULT_RETRY_TIMEOUT;
     private long retryInterval = DEFAULT_RETRY_INTERVAL;
@@ -70,7 +71,15 @@ class ManagedOfficeProcessSettings {
         this.templateProfileDir = templateProfileDir;
     }
 
-    public ProcessManager getProcessManager() {
+    public File getInstanceProfileDir() {
+		return instanceProfileDir;
+	}
+
+	public void setInstanceProfileDir(File instanceProfileDir) {
+		this.instanceProfileDir = instanceProfileDir;
+	}
+
+	public ProcessManager getProcessManager() {
         return processManager;
     }
 
