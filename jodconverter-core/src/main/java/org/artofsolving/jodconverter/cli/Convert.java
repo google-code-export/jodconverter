@@ -51,15 +51,18 @@ public class Convert {
     private static final Option OPTION_OUTPUT_FORMAT = new Option("f", "output-format", true, "output format (e.g. pdf)");
     private static final Option OPTION_PORT = new Option("p", "port", true, "office socket port (optional; defaults to 8100)");
     private static final Option OPTION_REGISTRY = new Option("r", "registry", true, "document formats registry configuration file (optional)");
+    private static final Option OPTION_TIMEOUT = new Option("t", "timeout", true, "maximum conversion time (optional; defaults to 120000ms)");
     private static final Options OPTIONS = initOptions();
 
     private static final int DEFAULT_OFFICE_PORT = 2002;
+    private static final long DEFAULT_TIMEOUT = 120000L; //2 minutes
 
     private static Options initOptions() {
         Options options = new Options();
         options.addOption(OPTION_OUTPUT_FORMAT);
         options.addOption(OPTION_PORT);
         options.addOption(OPTION_REGISTRY);
+        options.addOption(OPTION_TIMEOUT);
         return options;
     }
 
@@ -75,6 +78,11 @@ public class Convert {
         int port = DEFAULT_OFFICE_PORT;
         if (commandLine.hasOption(OPTION_PORT.getOpt())) {
             port = Integer.parseInt(commandLine.getOptionValue(OPTION_PORT.getOpt()));
+        }
+        
+        long timeout = DEFAULT_TIMEOUT;
+        if (commandLine.hasOption(OPTION_TIMEOUT.getOpt())) {
+        	timeout = Long.parseLong(commandLine.getOptionValue(OPTION_TIMEOUT.getOpt()));
         }
 
         String[] fileNames = commandLine.getArgs();
@@ -94,7 +102,7 @@ public class Convert {
             registry = new DefaultDocumentFormatRegistry();
         }
         
-        OfficeManager officeManager = new DefaultOfficeManagerConfiguration().setPortNumber(port).buildOfficeManager();
+        OfficeManager officeManager = new DefaultOfficeManagerConfiguration().setPortNumber(port).setTaskExecutionTimeout(timeout).buildOfficeManager();
         officeManager.start();
         OfficeDocumentConverter converter = new OfficeDocumentConverter(officeManager, registry);
         try {
