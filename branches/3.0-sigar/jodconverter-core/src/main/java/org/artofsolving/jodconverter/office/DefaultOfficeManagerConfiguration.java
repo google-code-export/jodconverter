@@ -33,6 +33,7 @@ public class DefaultOfficeManagerConfiguration {
     private String[] pipeNames = new String[] { "office" };
     private String[] runAsArgs = null;
     private File templateProfileDir = null;
+    private File instanceProfileDir = null;
     private long taskQueueTimeout = 30000L;  // 30 seconds
     private long taskExecutionTimeout = 120000L;  // 2 minutes
     private int maxTasksPerProcess = 200;
@@ -46,7 +47,7 @@ public class DefaultOfficeManagerConfiguration {
 
     public DefaultOfficeManagerConfiguration setOfficeHome(File officeHome) throws NullPointerException, IllegalArgumentException  {
         Preconditions.checkNotNull("officeHome", officeHome);
-        checkArgument("officeHome", officeHome.isDirectory(), "must exist and be a directory");
+        Preconditions.checkArgument(officeHome.isDirectory(), "officeHome must exist and be a directory");
         this.officeHome = officeHome;
         return this;
     }
@@ -64,7 +65,7 @@ public class DefaultOfficeManagerConfiguration {
 
     public DefaultOfficeManagerConfiguration setPortNumbers(int... portNumbers) throws NullPointerException, IllegalArgumentException {
         Preconditions.checkNotNull("portNumbers", portNumbers);
-        checkArgument("portNumbers", portNumbers.length > 0, "must not be empty");
+        Preconditions.checkArgument(portNumbers.length > 0, "portNumbers must not be empty");
         this.portNumbers = portNumbers;
         return this;
     }
@@ -77,7 +78,7 @@ public class DefaultOfficeManagerConfiguration {
 
     public DefaultOfficeManagerConfiguration setPipeNames(String... pipeNames) throws NullPointerException, IllegalArgumentException {
         Preconditions.checkNotNull("pipeNames", pipeNames);
-        checkArgument("pipeNames", pipeNames.length > 0, "must not be empty");
+        Preconditions.checkArgument(pipeNames.length > 0, "pipeNames must not be empty");
         this.pipeNames = pipeNames;
         return this;
     }
@@ -89,9 +90,23 @@ public class DefaultOfficeManagerConfiguration {
 
     public DefaultOfficeManagerConfiguration setTemplateProfileDir(File templateProfileDir) throws IllegalArgumentException {
         if (templateProfileDir != null) {
-            checkArgument("templateProfileDir", templateProfileDir.isDirectory(), "must exist and be a directory");
+        	Preconditions.checkArgument(templateProfileDir.isDirectory(), "templateProfileDir must exist and be a directory");
         }
         this.templateProfileDir = templateProfileDir;
+        return this;
+    }
+    
+    /**
+     * Default, this uses the systems default tmp directory.
+     * Use this method to change the directory
+     * @param instanceProfileDir - Directory to use for instance profile
+     * @throws IllegalArgumentException - If it is not a directory
+     */
+    public DefaultOfficeManagerConfiguration setInstanceProfileDir(File instanceProfileDir) throws IllegalArgumentException {
+        if (instanceProfileDir != null) {
+        	Preconditions.checkArgument(instanceProfileDir.isDirectory(), "instanceProfileDir must exist and be a directory");
+        }
+        this.instanceProfileDir = instanceProfileDir;
         return this;
     }
 
@@ -147,13 +162,7 @@ public class DefaultOfficeManagerConfiguration {
         for (int i = 0; i < numInstances; i++) {
             unoUrls[i] = (connectionProtocol == OfficeConnectionProtocol.PIPE) ? UnoUrl.pipe(pipeNames[i]) : UnoUrl.socket(portNumbers[i]);
         }
-        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, autokillOpenPipes, retryTimeout, new SigarProcessManager());
-    }
-
-        private void checkArgument(String argName, boolean condition, String message) throws IllegalArgumentException {
-        if (!condition) {
-            throw new IllegalArgumentException(argName + " " + message);
-        }
+        return new ProcessPoolOfficeManager(officeHome, unoUrls, runAsArgs, templateProfileDir, instanceProfileDir, taskQueueTimeout, taskExecutionTimeout, maxTasksPerProcess, autokillOpenPipes, retryTimeout, new SigarProcessManager());
     }
 
     private boolean isValidProfileDir(File profileDir) {

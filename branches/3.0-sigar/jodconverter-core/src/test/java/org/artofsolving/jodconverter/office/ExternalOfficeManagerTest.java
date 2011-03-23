@@ -30,7 +30,7 @@ public class ExternalOfficeManagerTest {
 
     public void executeTask() throws Exception {
         UnoUrl unoUrl = UnoUrl.socket(2002);
-        OfficeProcess officeProcess = new OfficeProcess(OfficeUtils.getDefaultOfficeHome(), unoUrl, null, null,false, new SigarProcessManager());
+        OfficeProcess officeProcess = new OfficeProcess(OfficeUtils.getDefaultOfficeHome(), unoUrl, null, null,null,false, new SigarProcessManager());
         officeProcess.start();
         Thread.sleep(2000);
         
