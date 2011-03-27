@@ -38,6 +38,14 @@
     </developer>
   </developers>
 
+  <repositories>
+    <repository>
+      <!-- required for org.hyperic:sigar* -->
+      <id>jboss-public-repository-group</id>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>commons-io</groupId>
