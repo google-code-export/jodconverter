@@ -1,7 +1,7 @@
 //
 // JODConverter - Java OpenDocument Converter
-// Copyright 2011 Art of Solving Ltd
-// Copyright 2004-2011 Mirko Nasato
+// Copyright 2009 Art of Solving Ltd
+// Copyright 2004-2009 Mirko Nasato
 //
 // JODConverter is free software: you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public License
