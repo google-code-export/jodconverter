@@ -189,15 +189,15 @@ public class PooledOfficeManagerTest {
         UnoUrl unoUrl = (UnoUrl) ReflectionUtils.getPrivateField(process, "unoUrl");
         
 		SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "soffice.*")
-							.addArgs(1, SimplePTQL.RE(), "-accept=" + unoUrl.getAcceptString() + ";urp;", Strategy.ESCAPE)
-							.addArgs(2, SimplePTQL.RE(), "-env:UserInstallation=.+", Strategy.ESCAPE)
-							.addArgs(3, SimplePTQL.EQ(), "-headless", Strategy.NOT_ESCAPE)
-							.addArgs(4, SimplePTQL.EQ(), "-nocrashreport", Strategy.NOT_ESCAPE)
-							.addArgs(5, SimplePTQL.EQ(), "-nodefault", Strategy.NOT_ESCAPE)
-							.addArgs(6, SimplePTQL.EQ(), "-nofirststartwizard", Strategy.NOT_ESCAPE)
-							.addArgs(7, SimplePTQL.EQ(), "-nolockcheck", Strategy.NOT_ESCAPE)
-							.addArgs(8, SimplePTQL.EQ(), "-nologo", Strategy.NOT_ESCAPE)
-							.addArgs(9, SimplePTQL.EQ(), "-norestore", Strategy.NOT_ESCAPE)
+							.addArgs("1", SimplePTQL.RE(), "-accept=" + unoUrl.getAcceptString() + ";urp;", Strategy.ESCAPE)
+							.addArgs("2", SimplePTQL.RE(), "-env:UserInstallation=.+", Strategy.ESCAPE)
+							.addArgs("3", SimplePTQL.EQ(), "-headless", Strategy.NOT_ESCAPE)
+							.addArgs("4", SimplePTQL.EQ(), "-nocrashreport", Strategy.NOT_ESCAPE)
+							.addArgs("5", SimplePTQL.EQ(), "-nodefault", Strategy.NOT_ESCAPE)
+							.addArgs("6", SimplePTQL.EQ(), "-nofirststartwizard", Strategy.NOT_ESCAPE)
+							.addArgs("7", SimplePTQL.EQ(), "-nolockcheck", Strategy.NOT_ESCAPE)
+							.addArgs("8", SimplePTQL.EQ(), "-nologo", Strategy.NOT_ESCAPE)
+							.addArgs("9", SimplePTQL.EQ(), "-norestore", Strategy.NOT_ESCAPE)
 							.createQuery();
 		
 		List<Long> find = new SigarProcessManager().find(ptql);
