@@ -66,16 +66,31 @@ public class SimplePTQL {
 			this.searchValue = searchValue;
 		}
 
-		public Builder addArgs(int argument, Operator operator, String searchValue, Strategy strategy) {
+		/**
+		 * Optional.
+		 * For adding arguments.
+		 * 
+		 * @param argument - Must be a numeric value or '*'. If wrong format '*' will be default. -1, means the last argument 
+		 * @param operator
+		 * @param searchValue
+		 * @param strategy
+		 */
+		public Builder addArgs(String argument, Operator operator, String searchValue, Strategy strategy) {
 			Preconditions.checkNotNull(searchValue);
 			
+			try {
+				Integer.parseInt(argument);
+			} catch(NumberFormatException nfe) {
+				argument = "*";
+			}
+			
 			if(strategy == Strategy.ESCAPE) {
-				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
+				args.append(",Args." + argument + "." + operator.toString() + PlatformUtils.escapePTQLForRegex(searchValue));
 			} else {
 				Pattern pattern = Pattern.compile(",|=");
 				Matcher matcher = pattern.matcher(searchValue);
 				Preconditions.checkArgument(!matcher.find(), "searchValue cannot contain comma or equals sign. Either set Strategy.ESCAPE or remove it from the search value");
-				args.append(",Args." + String.valueOf(argument) + "." + operator.toString() + searchValue);
+				args.append(",Args." + argument + "." + operator.toString() + searchValue);
 			}
 			
 			return this;

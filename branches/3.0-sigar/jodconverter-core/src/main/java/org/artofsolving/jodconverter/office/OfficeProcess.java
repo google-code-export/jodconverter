@@ -62,7 +62,7 @@ class OfficeProcess {
 
     public void start() throws SigarException, IOException {
     	SimplePTQL ptql = new SimplePTQL.Builder(SimplePTQL.STATE_NAME(), SimplePTQL.RE(), "soffice.*")
-		.addArgs(1, SimplePTQL.RE(),unoUrl.getAcceptString(), Strategy.ESCAPE)
+		.addArgs("*", SimplePTQL.RE(),unoUrl.getAcceptString(), Strategy.ESCAPE)
 		.createQuery();
         long existingPid = 0L;
 		try {
