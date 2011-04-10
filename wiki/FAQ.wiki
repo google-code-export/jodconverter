@@ -8,7 +8,7 @@
   Yes. In fact, JODConverter simply automates OOo operations; all actual conversions are performed by OOo. Trying to use JODConverter without OOo would be like trying to use say the MySQL JDBC driver without a MySQL database server. If it can't connect to a server, the driver is useless.
  # *Do I really really need to install !OpenOffice.org? There's no way to install only a few libraries/DLLs instead?*
   Yes you do really need a complete OOo installation. At most you can omit Base and a few optional component when installing.
-  (Splitting OOo conversion filters into independent components is one of the goals of an OOo sub-project called [http://odftoolkit.openoffice.org ODF Toolkit], but don't hold your breath.)
+  (Splitting OOo conversion filters into independent components is one of the goals of an OOo sub-project called [http://odftoolkit.org ODF Toolkit], but don't hold your breath.)
  # *How well does it convert format X to format Y?*
   Different people have different requirements/expectations. Why don't you just find out for yourself? Since JODConverter simply automates OOo conversions, you don't even need to install JODConverter to do some tests, you just need OOo. Manually open a document in format X with OOo, and save it as (or export it to) format Y. Voilà! No tricks, no gimmicks.
  # *When converting from format X to Y something in the output is not quite right*
