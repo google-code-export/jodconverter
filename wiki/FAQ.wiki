@@ -2,7 +2,7 @@
 
 = Frequently Asked Questions =
 
- Note: whenever _ !OpenOffice.org _ (_OOo_ for short) is mentioned, this can generally be interpreted to include any office suite derived from OOo such as _ !StarOffice _.
+ Note: whenever _ !OpenOffice.org _ (_OOo_ for short) is mentioned, this can generally be interpreted to include any office suite derived from OOo such as _ !LibreOffice _ and _ !StarOffice _.
 
  # *Do I really need to install !OpenOffice.org in order to use JODConverter?*
   Yes. In fact, JODConverter simply automates OOo operations; all actual conversions are performed by OOo. Trying to use JODConverter without OOo would be like trying to use say the MySQL JDBC driver without a MySQL database server. If it can't connect to a server, the driver is useless.
