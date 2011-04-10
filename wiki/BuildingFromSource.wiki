@@ -14,7 +14,7 @@ svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter-sample-we
 
 == Maven Build ==
 
-JODConverter uses Maven 2 as its build tool, so it can be built in the usual Maven way:
+JODConverter uses Maven 3 as its build tool, so it can be built in the usual Maven way:
 {{{
 cd jodconverter-core
 mvn package
@@ -26,7 +26,7 @@ mvn -DskipTests package
 
 You can build a ZIP distribution package containing all library dependencies with:
 {{{
-mvn assembly:assembly
+mvn assembly:single
 }}}
 which should result in a file called `jodconverter-core-3.0-SNAPSHOT-dist.zip` in the target dir.
 
