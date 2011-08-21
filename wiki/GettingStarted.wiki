@@ -6,15 +6,15 @@
 JODConverter 3.0 requires:
 
  # Java 1.5 or later
- # [http://download.openoffice.org OpenOffice.org] 3.0.0 or later 
+ # [http://download.openoffice.org OpenOffice.org] 3.x or [http://www.libreoffice.org/download/ LibreOffice]
 
-We recommend that you use the latest OOo version - currently 3.1.0.
+We recommend that you use the latest !OpenOffice.org or !LibreOffice version.
 
 = Command Line =
 
-The command line tool provides a good way to check that everything is working, i.e. that you have the right !OpenOffice.org version installed etc. To convert a document do e.g.:
+The command line tool provides a good way to check that everything is working, i.e. that you have the right OOo/LibO version installed etc. To convert a document do e.g.:
 {{{
-java -jar lib/jodconverter-core-3.0-beta-3.jar test.odt test.pdf
+java -jar lib/jodconverter-core-3.0-beta-4.jar test.odt test.pdf
 }}}
 
 Note: if all you want is a command line tool, you may also have a look at this [http://www.artofsolving.com/opensource/pyodconverter Python script]. It's smaller, simpler, and easier to customise.
@@ -34,7 +34,7 @@ Here's a basic example of Java code that converts a single document:
     officeManager.stop();
 }}}
 
-Note that these few lines will actually do quite a few things: start an OOo process that listens on the port 2002, connect to it, tell OOo to load `test.odt`, then to save it as pdf, and finally terminate the OOo process.
+Note that these few lines will actually do quite a few things: start an OOo process that listens on the port 2002, connect to it, tell OOo/LibO to load `test.odt`, then to save it as pdf, and finally terminate the OOo/LibO process.
 
 Here's another example showing a few configuration options:
 {{{
@@ -45,7 +45,7 @@ Here's another example showing a few configuration options:
       .setTaskExecutionTimeout(30000L)
       .buildOfficeManager();
 }}}
-This `officeManager` will use the OOo installation in the specified directory, connecting via named pipes rather than TCP sockets, use a pool of two OOo processes identified by the given pipe names, and abort any conversion that takes longer than 30 seconds. (Note that using named pipes requires adding a native library to `java.library.path`; see [Configuration] for more info.)
+This `officeManager` will use the OOo/LibO installation in the specified directory, connecting via named pipes rather than TCP sockets, use a pool of two OOo/LibO processes identified by the given pipe names, and abort any conversion that takes longer than 30 seconds. (Note that using named pipes requires adding a native library to `java.library.path`; see [Configuration] for more info.)
 
 == Web Applications ==
 
