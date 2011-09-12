@@ -33,3 +33,97 @@ java "-Djava.library.path=C:\Program Files\OpenOffice.org 3\URE\bin" ...
 }}}
 
 
+== Sigar Process Implementation ==
+
+[http://support.hyperic.com/display/SIGAR/Home Hyperic SIGAR] (System Information Gatherer And Reporter), provides a portable and native way of gathering system information.
+
+Its a much more robust way of handling processes, and we recommend users to use this.
+
+If you want to use Sigar in JODConverter, you have to change the ProcessManager and use SigarProcessManager
+
+{{{
+OfficeManager officeManager = new DefaultOfficeManagerConfiguration()
+.setProcessManager(new SigarProcessManager())
+.buildOfficeManager();
+
+}}}
+
+SIGAR requires native libraries to be run.
+For example, minimal requirements to use the SIGAR Java API on Windows would be `sigar.jar` and `sigar-x86-winnt.dll`
+
+Here is a complete list of native libraries required for your environment: 
+{{{
+libsigar-x86-linux.so                                Linux AMD/Intel 32-bit
+libsigar-amd64-linux.so                              Linux AMD/Intel 64-bit  
+libsigar-ppc-linux.so                                Linux PowerPC 32-bit    
+libsigar-ppc64-linux.so                              Linux PowerPC 64-bit    
+libsigar-ia64-linux.so                               Linux Itanium 64-bit    
+libsigar-s390x-linux.so                              Linux zSeries 64-bit    
+sigar-x86-winnt.dll                                  Windows AMD/Intel 32-bit        
+sigar-amd64-winnt.dll                                Windows AMD/Intel 64-bit        
+libsigar-ppc-aix-5.so                                AIX PowerPC 32-bit      
+libsigar-ppc64-aix-5.so                              AIX PowerPC 64-bit      
+libsigar-pa-hpux-11.sl                               HP-UX PA-RISC 32-bit    
+libsigar-ia64-hpux-11.sl                             HP-UX Itanium 64-bt     
+libsigar-sparc-solaris.so                            Solaris Sparc 32-bit    
+libsigar-sparc64-solaris.so                          Solaris Sparc 64-bit    
+libsigar-x86-solaris.so                              Solaris AMD/Intel 32-bit        
+libsigar-amd64-solaris.so                            Solaris AMD/Intel 64-bit        
+libsigar-universal-macosx.dylib                      Mac OS X PowerPC/Intel 32-bit   
+libsigar-universal64-macosx.dylib                    Mac OS X PowerPC/Intel 64-bit   
+libsigar-x86-freebsd-5.so                            FreeBSD 5.x AMD/Intel 32-bit    
+libsigar-x86-freebsd-6.so                            FreeBSD 6.x AMD/Intel 64-bit    
+libsigar-amd64-freebsd-6.so                          FreeBSD 6.x AMD/Intel 64-bit
+}}}
+For an updated list see [http://support.hyperic.com/display/SIGAR/Home#Home-binaries here.]
+
+=== Including Sigar in your project ===
+There are two ways to include Sigar in your project
+
+*One way is to* download Sigar distribution manually from [https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/org/hyperic/sigar-dist/1.6.5.132/sigar-dist-1.6.5.132.zip here]
+then unzip the file, and include `sigar.jar` to the classpath and the appropriate native library to `java.library.path`
+----
+However, if you want a more automatic way of doing it, you can add the following to the pom.xml file, and let maven do it for you:
+{{{
+  <dependency>
+    <groupId>org.hyperic</groupId>
+    <artifactId>sigar</artifactId>
+    <version>1.6.5.132</version>
+  </dependency>
+  <dependency>
+    <groupId>org.hyperic</groupId>
+    <artifactId>sigar-dist</artifactId>
+    <version>1.6.5.132</version>
+    <type>zip</type>
+  </dependency>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <includes>**/sigar-bin/lib/*</includes>
+              <excludes>**/sigar-bin/lib/*jar</excludes>
+              <includeGroupIds>org.hyperic</includeGroupIds>
+              <includeArtifactIds>sigar-dist</includeArtifactIds>
+              <outputDirectory>
+                ${project.build.directory}/depends
+                <!-- or: ${project.basedir}/depends -->
+              </outputDirectory>
+              </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+}}}
+This will create a folder called `depends` where the native libraries are found. You will need to add this folder to `java.library.path`.
