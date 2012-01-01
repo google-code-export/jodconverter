@@ -14,7 +14,7 @@ svn checkout http://jodconverter.googlecode.com/svn/trunk/jodconverter-sample-we
 
 == Maven Build ==
 
-JODConverter uses Maven 3 as its build tool, so it can be built in the usual Maven way. A Sigar native library is now required for compiling (although it's optional at runtime): download the right one for your system from [http://svn.hyperic.org/projects/sigar_bin/dist/SIGAR_1_6_5/lib/ svn.hyperic.org] and save it to a local dir.
+JODConverter uses Maven 3 as its build tool, so it can be built in the usual Maven way. A Sigar native library is now required for building (although it's optional at runtime): download the right one for your system from [http://svn.hyperic.org/projects/sigar_bin/dist/SIGAR_1_6_5/lib/ svn.hyperic.org] and save it to a local dir.
 {{{
 cd jodconverter-core
 mvn -Djava.library.path=/path/to/sigar/lib install
